@@ -1,109 +1,145 @@
-import random
+import copy
+import math
+
 
 class ComputerPlayer:
-    def __init__(self, symbol):
+    def __init__(self, symbol, human_symbol):
         self.symbol = symbol
+        self.human_symbol = human_symbol
 
-    def make_move(self, connect4):
-        # Function to check if there are three consecutive symbols in a list
-        def has_three_consecutive(lst, symbol):
+    def minimax(self, connect4, depth, maximizing_player):
+        """
+                Applies the Minimax algorithm to evaluate and choose the best move.
+
+                Parameters:
+                - connect4 (Connect4Board): The Connect4 board state.
+                - depth (int): The depth of the Minimax algorithm, representing the look-ahead depth.
+                - maximizing_player (bool): True if the current player is the maximizing player, False otherwise.
+
+                Returns:
+                - int: The evaluation score for the current move.
+                """
+        if depth == 0 or connect4.is_game_over():
+            return self.evaluate_board(connect4)
+
+        valid_moves = [col for col in range(connect4.cols) if connect4.is_valid_move(col)]
+
+        if maximizing_player:
+            max_eval = float('-inf')
+            for col in valid_moves:
+                temp_board = connect4.copy_board()
+                temp_board.make_move(col, self.symbol)
+                eval = self.minimax(temp_board, depth - 1, False)
+                max_eval = max(max_eval, eval)
+            return max_eval
+        else:
+            min_eval = float('inf')
+            for col in valid_moves:
+                temp_board = connect4.copy_board()
+                temp_board.make_move(col, 'X' if self.symbol == 'O' else 'O')
+                eval = self.minimax(temp_board, depth - 1, True)
+                min_eval = min(min_eval, eval)
+            return min_eval
+
+    def evaluate_board(self, connect4):
+        """
+               Evaluates the Connect4 board state and assigns a score to it.
+
+               Parameters:
+               - connect4 (Connect4Board): The Connect4 board state.
+
+               Returns:
+               - int: The score representing the evaluation of the board state.
+               """
+        def count_consecutive_symbols_in_line(line, symbol):
             count = 0
-            for cell in lst:
+            for cell in line:
                 if cell == symbol:
                     count += 1
-                    if count == 3:
-                        return True
                 else:
-                    count = 0
-            return False
+                    break
+            return count
 
-        winning_move = self.check_winning_move(connect4, has_three_consecutive)
-        if winning_move is not None:
-            return winning_move
+        def score_line(line, symbol):
+            count = count_consecutive_symbols_in_line(line, symbol)
+            if count >= 4:
+                return 1000  # Winning move
+            elif count == 3:
+                return 50  # Three in a row
+            elif count == 2:
+                return 10  # Two in a row
+            else:
+                return 0
 
-        blocking_move = self.check_blocking_move(connect4, has_three_consecutive)
-        if blocking_move is not None:
-            return blocking_move
+        score = 0
 
-        competitive_move = self.check_competitive_move(connect4, has_three_consecutive)
-        if competitive_move is not None:
-            return competitive_move
+        for row in range(connect4.rows):
+            for col in range(connect4.cols):
+                # Evaluate horizontally
+                score += score_line(connect4.board[row][col:col + 4], self.symbol)
 
-        # If no winning, blocking or competitive move, make a random move
-        valid_moves = [col for col in range(connect4.cols) if connect4.is_valid_move(col)]
-        return random.choice(valid_moves)
+                # Evaluate vertically
+                score += score_line([connect4.board[row + i][col] for i in range(4) if row + i < len(connect4.board)], self.symbol)
 
-    def check_winning_move(self, connect4, has_three_consecutive):
+                # Evaluate diagonally (top-left to bottom-right)
+                score += score_line([connect4.board[row + i][col + i] for i in range(4) if row + i < len(connect4.board) and col + i < len(connect4.board[0])], self.symbol)
+
+                # Evaluate diagonally (bottom-left to top-right)
+                score += score_line([connect4.board[row - i][col + i] for i in range(4) if 0 <= row - i < len(connect4.board) and 0 <= col + i < len(connect4.board[0])], self.symbol)
+
+        # Bonus for central moves
+        central_columns = [connect4.cols // 2 - 1, connect4.cols // 2, connect4.cols // 2 + 1]
+        central_moves = sum([1 for move in central_columns if connect4.last_move == move])
+        score += central_moves * 20
+
+        return score
+
+    def find_best_move(self, connect4, depth):
+        """
+                Finds the best move for the computer player using the Minimax algorithm.
+
+                Parameters:
+                - connect4 (Connect4Board): The Connect4 board state.
+                - depth (int): The depth of the Minimax algorithm, representing the look-ahead depth.
+
+                Returns:
+                - int: The column index representing the best move for the computer player.
+                """
+        best_score = -math.inf  # Initialize best_score to negative infinity
+        best_move = None
+        # Check if human player can win in the next move
         for col in range(connect4.cols):
-            if connect4.is_valid_move(col):
-                temp_board = [row[:] for row in connect4.board]
-                # Find the first row in the column that contains a space
-                for row in reversed(range(connect4.rows)):
-                    if temp_board[row][col] == ' ':
-                        temp_board[row][col] = self.symbol
-                        break
-                if connect4.check_winner(self.symbol):
+            if connect4.is_valid_location(col):
+                # Make a copy of the board and make the move for the human player
+                temp_board = copy.deepcopy(connect4)
+                temp_board.make_move(col, self.human_symbol)
+                # If this move makes the human player win, return this column to block the human player
+                if temp_board.check_winner(self.human_symbol):
                     return col
-        return None
 
-    def check_blocking_move(self, connect4, has_three_consecutive):
-        # Check horizontally
-        for row in range(connect4.rows):
-            for col in range(connect4.cols - 2):
-                if has_three_consecutive(connect4.board[row][col:col+3], 'X'):
-                    if connect4.is_valid_move(col + 2):
-                        return col + 2
-
-        # Check vertically
+        # If human player can't win in the next move, use Minimax algorithm
         for col in range(connect4.cols):
-            for row in range(connect4.rows - 2):
-                if has_three_consecutive([connect4.board[row+i][col] for i in range(3)], 'X'):
-                    if connect4.is_valid_move(col):
-                        return col
+            temp_board = copy.deepcopy(connect4)
+            if temp_board.is_valid_location(col):
+                temp_board.make_move(col, self.symbol)
+                score = self.minimax(temp_board, depth - 1, False)
+                if score > best_score:
+                    best_score = score
+                    best_move = col
 
-        # Check diagonally (top-left to bottom-right)
-        for row in range(connect4.rows - 2):
-            for col in range(connect4.cols - 2):
-                if has_three_consecutive([connect4.board[row+i][col+i] for i in range(3)], 'X'):
-                    if connect4.is_valid_move(col + 2):
-                        return col + 2
+        return best_move
 
-        # Check diagonally (bottom-left to top-right)
-        for row in range(2, connect4.rows):
-            for col in range(connect4.cols - 2):
-                if has_three_consecutive([connect4.board[row-i][col+i] for i in range(3)], 'X'):
-                    if connect4.is_valid_move(col + 2):
-                        return col + 2
+    # Modify the make_move method to use the Minimax algorithm
+    def make_move(self, connect4):
+        """
+                Makes a move for the computer player using the Minimax algorithm.
 
-        return None
+                Parameters:
+                - connect4 (Connect4Board): The Connect4 board state.
 
-    def check_competitive_move(self, connect4, has_three_consecutive):
-        # Check for competitive horizontal move
-        for row in range(connect4.rows):
-            for col in range(connect4.cols - 2):
-                if has_three_consecutive(connect4.board[row][col:col+3], self.symbol):
-                    if connect4.is_valid_move(col + 2):
-                        return col + 2
+                Returns:
+                - int: The column index representing the chosen move for the computer player.
+                """
+        return self.find_best_move(connect4, depth=3)
 
-        # Check for competitive vertical move
-        for col in range(connect4.cols):
-            for row in range(connect4.rows - 2):
-                if has_three_consecutive([connect4.board[row+i][col] for i in range(3)], self.symbol):
-                    if connect4.is_valid_move(col):
-                        return col
 
-        # Check for competitive diagonal move (top-left to bottom-right)
-        for row in range(connect4.rows - 2):
-            for col in range(connect4.cols - 2):
-                if has_three_consecutive([connect4.board[row+i][col+i] for i in range(3)], self.symbol):
-                    if connect4.is_valid_move(col + 2):
-                        return col + 2
-
-        # Check for competitive diagonal move (bottom-left to top-right)
-        for row in range(2, connect4.rows):
-            for col in range(connect4.cols - 2):
-                if has_three_consecutive([connect4.board[row-i][col+i] for i in range(3)], self.symbol):
-                    if connect4.is_valid_move(col + 2):
-                        return col + 2
-
-        return None
