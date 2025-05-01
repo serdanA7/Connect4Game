@@ -71,7 +71,7 @@ class Connect4Board:
         """
         return all(self.board[0][col] != ' ' for col in range(self.cols))
 
-    # ... (continuing with the remaining functions)
+
     def copy_board(self):
         """
         Creates a copy of the current board.
@@ -121,25 +121,25 @@ class Connect4Board:
         return True
 
     def check_winner(self, symbol):
-        # Check horizontal
+        # orizontal
         for row in range(self.rows):
             for col in range(self.cols - 3):
                 if all(self.board[row][col + i] == symbol for i in range(4)):
                     return True
 
-        # Check vertical
+        # vertical
         for row in range(self.rows - 3):
             for col in range(self.cols):
                 if all(self.board[row + i][col] == symbol for i in range(4)):
                     return True
 
-        # Check diagonal (top-left to bottom-right)
+        # diagonal 1
         for row in range(self.rows - 3):
             for col in range(self.cols - 3):
                 if all(self.board[row + i][col + i] == symbol for i in range(4)):
                     return True
 
-        # Check diagonal (bottom-left to top-right)
+        # diagonal 2
         for row in range(3, self.rows):
             for col in range(self.cols - 3):
                 if all(self.board[row - i][col + i] == symbol for i in range(4)):

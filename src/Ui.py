@@ -25,7 +25,7 @@ class Connect4Game:
                 print("It's a draw!")
                 break
 
-            # Computer player's turn
+
             computer_col = self.computer_player.make_move(self.connect4)
             self.connect4.make_move(computer_col, 'O')
             if self.connect4.check_winner('O'):

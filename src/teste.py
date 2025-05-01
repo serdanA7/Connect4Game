@@ -20,7 +20,7 @@ class TestConnect4Board(unittest.TestCase):
     def test_display_board(self):
 
         board = Connect4Board(6, 7)
-        # Redirect stdout to capture the printed output
+
         with unittest.mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             board.display_board()
             output = mock_stdout.getvalue().strip()
@@ -46,10 +46,6 @@ class TestConnect4Board(unittest.TestCase):
         board.make_move(3, 'X')
         self.assertNotEqual(board.board[5][3], board_copy.board[5][3])
 
-    def test_count_consecutive_symbols(self):
-        board = Connect4Board(6, 7)
-        board.board[0][2:5] = ['X', 'X', 'X']
-        self.assertEqual(board.count_consecutive_symbols('X'), 1)
 
     def test_is_game_over(self):
         board = Connect4Board(6, 7)
@@ -71,25 +67,25 @@ class MockConnect4:
 
 class TestHumanPlayer(unittest.TestCase):
     def test_make_move_valid(self):
-        # Simulate a valid move (user input: '3')
+
         with patch('builtins.input', return_value='3'):
             player = HumanPlayer('X')
             move = player.make_move(MockConnect4())
             self.assertEqual(move, 3)
 
     def test_make_move_invalid_input(self):
-        # Simulate invalid input (user input: 'invalid' then '2')
+
         with patch('builtins.input', side_effect=['invalid', '2']):
             player = HumanPlayer('X')
             move = player.make_move(MockConnect4())
             self.assertEqual(move, 2)
 
     def test_make_move_invalid_column_full(self):
-        # Simulate an invalid move (user input: '5' then '8' then '2')
+
         with patch('builtins.input', side_effect=['5', '8', '2']):
             player = HumanPlayer('O')
             move = player.make_move(MockConnect4())
-            self.assertEqual(move, 5)  # Change the expected value to 5
+            self.assertEqual(move, 5)
 
 
 

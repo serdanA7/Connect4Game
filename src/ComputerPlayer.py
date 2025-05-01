@@ -63,11 +63,11 @@ class ComputerPlayer:
         def score_line(line, symbol):
             count = count_consecutive_symbols_in_line(line, symbol)
             if count >= 4:
-                return 1000  # Winning move
+                return 1000
             elif count == 3:
-                return 50  # Three in a row
+                return 50
             elif count == 2:
-                return 10  # Two in a row
+                return 10
             else:
                 return 0
 
@@ -87,7 +87,7 @@ class ComputerPlayer:
                 # Evaluate diagonally (bottom-left to top-right)
                 score += score_line([connect4.board[row - i][col + i] for i in range(4) if 0 <= row - i < len(connect4.board) and 0 <= col + i < len(connect4.board[0])], self.symbol)
 
-        # Bonus for central moves
+
         central_columns = [connect4.cols // 2 - 1, connect4.cols // 2, connect4.cols // 2 + 1]
         central_moves = sum([1 for move in central_columns if connect4.last_move == move])
         score += central_moves * 20
@@ -105,19 +105,17 @@ class ComputerPlayer:
                 Returns:
                 - int: The column index representing the best move for the computer player.
                 """
-        best_score = -math.inf  # Initialize best_score to negative infinity
+        best_score = -math.inf
         best_move = None
-        # Check if human player can win in the next move
+
         for col in range(connect4.cols):
             if connect4.is_valid_location(col):
-                # Make a copy of the board and make the move for the human player
                 temp_board = copy.deepcopy(connect4)
                 temp_board.make_move(col, self.human_symbol)
-                # If this move makes the human player win, return this column to block the human player
                 if temp_board.check_winner(self.human_symbol):
                     return col
 
-        # If human player can't win in the next move, use Minimax algorithm
+
         for col in range(connect4.cols):
             temp_board = copy.deepcopy(connect4)
             if temp_board.is_valid_location(col):
@@ -129,7 +127,7 @@ class ComputerPlayer:
 
         return best_move
 
-    # Modify the make_move method to use the Minimax algorithm
+
     def make_move(self, connect4):
         """
                 Makes a move for the computer player using the Minimax algorithm.
