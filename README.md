@@ -1,45 +1,44 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Fc9p7bRJ)
-# :video_game: Assignment 10 - Let's play
-## Requirements
-- You will be given one of the problems below to solve
-- Use object oriented programming and layered architecture
-- All modules with the exception of the UI will have specifications and PyUnit test cases
-- The program will be implemented as a human player vs. computer player game
-- The program must protect itself against the user’s invalid input
+Connect4Game
+Connect4Game is a Python implementation of the classic Connect Four game, allowing a human player to compete against a computer opponent. The project emphasizes object-oriented programming principles and layered architecture. It includes both a console-based user interface and an optional graphical user interface (GUI) for enhanced user experience.​
 
-**NB!** We do not expect you to implement optimal play for the computer player. However, it should still employ a strategy when making its moves in order to attempt to win the game and provide an entertaining opponent for the human player. Minimally, the computer player should move to win the game whenever possible and should block the human player’s attempts at 1-move victory, whenever possible
+Features
+Human vs. Computer Gameplay: Engage in a game against a computer opponent that employs basic strategic moves.
 
-**deadline is week 14**
+Input Validation: Robust handling of user inputs to prevent invalid moves and ensure smooth gameplay.
 
-## GUI Bonus (0.2P)
-- In addition to the console-based user interface required, also implement a graphical user interface (GUI) for the program
-- To receive the bonus, both user interfaces (menu-based and graphical) must use the same program layers. You have to be able to start the application with either user interface
-## AI Bonus (0.2P)
-- Implement computer AI using a [minimax algorithm](https://en.wikipedia.org/wiki/Minimax). Computer play should be competitive against the human player
-- In the case where minimax cannot be applied (e.g. Battleship, which is not a [complete information](https://en.wikipedia.org/wiki/Complete_information) game), find a suitable alternative; talk to your lab professor about the bonus possibility in this case
-## Best-of-FP Bonus (0.2P)
-- This bonus will be awarded to the very best implementations. To receive it, you need to implement both the **GUI** and **AI** bonuses, follow all implementation requirements, and have your work be selected by the laboratory professor
-- These implementations will be part of a separate GitHub repository that we aim to make publicly accessible in order to feature some of our students' best work during this semester
+Layered Architecture: Separation of concerns through distinct modules for game logic, user interface, and testing.
 
+Unit Testing: Comprehensive PyUnit test cases for non-UI modules to ensure code reliability.
 
-## Problem Statements
-### Connect Four
-The game is described [here](https://en.wikipedia.org/wiki/Connect_Four)
+Optional GUI: A graphical interface built with Tkinter, providing an alternative to the console-based UI.​
 
-### Gomoku
-The game is described [here](https://en.wikipedia.org/wiki/Gomoku)
+Requirements
+Python 3.6 or higher
 
-### Obstruction
-The game is described [here](http://www.papg.com/show?2XMX)
+Tkinter (for GUI version)​
 
-### Battleship
-The game is described [here](https://en.wikipedia.org/wiki/Battleship_(game))
+Gameplay Overview
+Objective: Be the first to connect four of your discs in a row—vertically, horizontally, or diagonally.
 
-### Planes
-The game is described [here](https://ro.wikipedia.org/wiki/Avioane_(joc))
+Turns: Players alternate turns, dropping one disc into a column per turn.
 
-### Nine men's morris
-The game is described [here](https://en.wikipedia.org/wiki/Nine_men%27s_morris)
+Winning: The first player to align four discs wins the game.
 
-### Other games
-You are free to implement a different board game, as long as its complexity is similar to those above. Talk to your laboratory professor to validate your idea before starting work!
+Draw: If the board is full and no player has four aligned discs, the game ends in a draw.​
+GitHub
++4
+GitHub
++4
+GitHub
++4
+
+Computer Player Strategy
+The computer opponent employs a basic strategy:​
+
+Winning Move: If a winning move is available, the computer will take it.
+
+Blocking: If the human player is one move away from winning, the computer will block that move.
+
+Random Move: If no immediate win or block is necessary, the computer selects a random valid column.​
+
+Note: The AI does not implement advanced algorithms like minimax; it focuses on immediate threats and opportunities.​
